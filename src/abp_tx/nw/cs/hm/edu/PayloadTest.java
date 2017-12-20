@@ -14,17 +14,17 @@ public class PayloadTest {
 		}
 
 		// output the file contents
-		// for (int i = 0; i < p.getSize(); i++)
-		// System.out.print((char)p.getCompleteDataArray()[i]);
-		//
+		 for (int i = 0; i < p.getSize(); i++)
+		 System.out.print((char)p.getCompleteDataArray()[i]);
+		
 
-		while (true) {
-			try {
-				System.out.print((char) p.getNextByte());
-			} catch (NoBytesLeftException nble) {
-				break;
-			}
-		}
+//		while (true) {
+//			try {
+//				System.out.print((char) p.getNextByte());
+//			} catch (NoBytesLeftException nble) {
+//				break;
+//			}
+//		}
 
 	}
 
