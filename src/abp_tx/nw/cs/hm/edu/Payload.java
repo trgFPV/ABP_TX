@@ -9,6 +9,7 @@ public class Payload {
 	private ArrayList<Byte> dataArray = new ArrayList<>();
 	private int idx;
 	private int size;
+	public boolean splitted = false;
 
 	/*
 	 * create a new payload object using a existing file on the hard disk this will
@@ -29,6 +30,7 @@ public class Payload {
 		} finally {
 			fis.close();
 			System.out.println(this.getClass() + "::read " + size + " bytes");
+			splitted = true;
 		}
 	}
 
