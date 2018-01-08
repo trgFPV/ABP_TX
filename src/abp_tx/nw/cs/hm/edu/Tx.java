@@ -17,6 +17,7 @@ public class Tx {
 	private int checkSumNrSize = 0;
 	private Payload payload = null;
 	DatagramSocket outPutSocket = new DatagramSocket();
+	public boolean allSend = false;
 
 	public Tx(InetAddress rx_ip, int port, int completePkgSize, int dataPkgSize, Payload payload)
 			throws SocketException, InvalidPackageSizeException {

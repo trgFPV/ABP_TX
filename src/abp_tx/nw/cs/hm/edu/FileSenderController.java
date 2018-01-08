@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import abp_tx.nw.cs.hm.edu.FsmWoman.Msg;
@@ -25,6 +28,9 @@ public class FileSenderController implements Runnable {
 	private Transition[][] transition;
 
 	private Payload pay;
+	private Tx transmitter;
+	private int index = 0;
+	private int size;
 
 	/**
 	 * constructor
@@ -64,6 +70,10 @@ public class FileSenderController implements Runnable {
 		}
 		System.out.println("INFO State: " + currentState);
 	}
+	
+	public static void main(String[] args) {
+		new Thread(new FileSenderController()).run();
+	}
 
 	public void run() {
 		switch (currentState) {
@@ -92,21 +102,76 @@ public class FileSenderController implements Runnable {
 			break;
 
 		case BUILD_CONNECTION:
+			InetAddress adress = null;
+			try {
+				adress = InetAddress.getLocalHost();
+			} catch (UnknownHostException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				transmitter = new Tx(adress,8000,pay.getCompleteDataArray().length,1400,pay);
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidPackageSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;
+			
+		case SEND_FIRST:
+			size = pay.getSize();
+			try {
+				transmitter.send(index);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			processMsg(Msg.ACK0_RECEIVED);
+			break;
+
 
 		case SEND:
-			break;
-
-		case SEND_FIRST:
+			index++;
+			try {
+				transmitter.send(index);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(index == (size-1)) {
+				transmitter.allSend = true;
+			}
 			break;
 
 		case SEND_NEXT:
+			index++;
+			try {
+				transmitter.send(index);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(index == (size-1)) {
+				transmitter.allSend = true;
+			}
 			break;
 
 		case SEND_AGAIN:
+			try {
+				transmitter.send(index);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(index == (size-1)) {
+				transmitter.allSend = true;
+			}
 			break;
 
 		case RECEIVE_ACK0:
+			
 			break;
 
 		case RECEIVE_ACK1:
