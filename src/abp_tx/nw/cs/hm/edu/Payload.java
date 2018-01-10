@@ -56,4 +56,9 @@ public class Payload {
 	public int getSize() {
 		return size;
 	}
+	
+	public String getHeader() {
+		String head = "";
+		return head;
+	}
 }
