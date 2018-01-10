@@ -41,6 +41,10 @@ public class Payload {
 			return (byte) dataArray.get(++this.idx);
 		}
 	}
+	
+	public int getSequence () {
+		return idx;
+	}
 
 	public byte[] getCompleteDataArray() {
 		byte[] array = new byte[this.size];
@@ -55,10 +59,5 @@ public class Payload {
 	 */
 	public int getSize() {
 		return size;
-	}
-	
-	public String getHeader() {
-		String head = "";
-		return head;
 	}
 }

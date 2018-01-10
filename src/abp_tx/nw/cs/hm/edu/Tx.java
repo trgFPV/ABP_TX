@@ -1,5 +1,6 @@
 package abp_tx.nw.cs.hm.edu;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -15,6 +16,7 @@ public class Tx {
 	private int dataPkgSize = 0;
 	private int sequenceNrSize = 0;
 	private int checkSumNrSize = 0;
+	private int ack = 0;
 	private Payload payload = null;
 	DatagramSocket outPutSocket = new DatagramSocket();
 	public boolean allSend = false;
@@ -41,13 +43,31 @@ public class Tx {
 	}
 
 	public DatagramPacket preparePacket(int index) {
-		// package data = payload + 4 bytes sequence + sequenceNrSize + checkSumSize
+		// package data = payload + 4 bytes sequence + sequenceNrSize +
+		// checkSumSize
 
 		// copy the dataFrame from the payload
 		byte[] dataFrame = payload.getCompleteDataArray();
 		dataFrame = Arrays.copyOfRange(dataFrame, index, index + dataPkgSize);
+		
+		byte[] header = getHeader(dataFrame);
 
-		return new DatagramPacket(dataFrame, completePkgSize, RX_IP, PORT);
+		return new DatagramPacket(header,header.length , RX_IP, PORT);
+	}
+
+	public byte[] getHeader(byte[] data) {
+
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		output.write(ack);
+		output.write(payload.getSequence());
+		try {
+			output.write(storeLongInToByte(generateChecksum(data)));
+			output.write(data);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return output.toByteArray();
 	}
 
 	private long generateChecksum(byte[] field) {
@@ -59,24 +79,24 @@ public class Tx {
 	public static byte[] storeLongInToByte(Long data) {
 		// bytes needed to store data
 		int n = 1;
-		
+
 		// if we need to store a 0 we still need atleast one byte
 		if (data != 0l) {
 			n = (int) Math.ceil((Math.log(data) / Math.log(2)) / 8);
 		}
-		
-		byte dataArray [] = new byte [n];
-		
+
+		byte dataArray[] = new byte[n];
+
 		for (int i = 0; n > i; i++) {
 			int bitmask = 0x0000FF;
 			byte valueToStore = (byte) (data & bitmask);
-			
+
 			dataArray[i] = valueToStore;
-			
+
 			System.out.println("bitmask: " + bitmask);
 			System.out.println("value: " + valueToStore);
-			
-			for(int x = 0; x <= 7; x++) {
+
+			for (int x = 0; x <= 7; x++) {
 				data >>>= data;
 			}
 		}
