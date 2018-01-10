@@ -6,6 +6,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
@@ -18,7 +19,7 @@ public class Tx {
 	private int checkSumNrSize = 0;
 	private int ack = 0;
 	private Payload payload = null;
-	DatagramSocket outPutSocket = new DatagramSocket();
+	DatagramSocket outPutSocket;
 	public boolean allSend = false;
 
 	public Tx(InetAddress rx_ip, int port, int completePkgSize, int dataPkgSize, Payload payload)
@@ -28,6 +29,7 @@ public class Tx {
 		if (completePkgSize < dataPkgSize + checkSumNrSize + sequenceNrSize) {
 			throw new InvalidPackageSizeException();
 		}
+		this.outPutSocket = new DatagramSocket(8080, InetAddress.getLoopbackAddress());
 
 		this.RX_IP = rx_ip;
 		this.PORT = port;
@@ -49,10 +51,10 @@ public class Tx {
 		// copy the dataFrame from the payload
 		byte[] dataFrame = payload.getCompleteDataArray();
 		dataFrame = Arrays.copyOfRange(dataFrame, index, index + dataPkgSize);
-		
+
 		byte[] header = getHeader(dataFrame);
 
-		return new DatagramPacket(header,header.length , RX_IP, PORT);
+		return new DatagramPacket(header, header.length, RX_IP, PORT);
 	}
 
 	public byte[] getHeader(byte[] data) {

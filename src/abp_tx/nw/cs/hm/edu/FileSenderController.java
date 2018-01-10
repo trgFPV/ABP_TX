@@ -110,7 +110,7 @@ public class FileSenderController implements Runnable {
 				e1.printStackTrace();
 			}
 			try {
-				transmitter = new Tx(adress,8000,pay.getCompleteDataArray().length,1400,pay);
+				transmitter = new Tx(adress,8086,pay.getCompleteDataArray().length,1400,pay);
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
