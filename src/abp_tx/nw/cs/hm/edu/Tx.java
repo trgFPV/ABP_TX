@@ -31,7 +31,8 @@ public class Tx {
 		if (completePkgSize < dataPkgSize + checkSumNrSize + sequenceNrSize) {
 			throw new InvalidPackageSizeException();
 		}
-		this.outPutSocket = new DatagramSocket(8080, InetAddress.getLoopbackAddress());
+			this.outPutSocket = new DatagramSocket(8086);
+		
 
 		this.RX_IP = rx_ip;
 		this.PORT = port;
@@ -62,15 +63,15 @@ public class Tx {
 	public byte[] getHeader(byte[] data) {
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		output.write(ack);
-		output.write(payload.getSequence());
+		
 		try {
+			output.write(storeIntInToByte(ack));
+			output.write(storeIntInToByte(payload.getSequence()));
 			output.write(storeLongInToByte(generateChecksum(data)));
 			output.write(data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		return output.toByteArray();
 	}
 
@@ -81,36 +82,44 @@ public class Tx {
 	}
 
 	public static byte[] storeLongInToByte(Long data) {
-//		// bytes needed to store data
-//		int n = 1;
-//
-//		// if we need to store a 0 we still need atleast one byte
-//		if (data != 0l) {
-//			n = (int) Math.ceil((Math.log(data) / Math.log(2)) / 8);
-//		}
-//
-//		byte dataArray[] = new byte[n];
-//
-//		for (int i = 0; n > i; i++) {
-//			int bitmask = 0x0000FF;
-//			byte valueToStore = (byte) (data & bitmask);
-//
-//			dataArray[i] = valueToStore;
-//
-//			System.out.println("bitmask: " + bitmask);
-//			System.out.println("value: " + valueToStore);
-//
-//			for (int x = 0; x <= 7; x++) {
-//				data >>>= data;
-//			}
-//		}
-//
-//		// bytes needed
-//		System.out.println(n);
-//		return dataArray;
+		// // bytes needed to store data
+		// int n = 1;
+		//
+		// // if we need to store a 0 we still need atleast one byte
+		// if (data != 0l) {
+		// n = (int) Math.ceil((Math.log(data) / Math.log(2)) / 8);
+		// }
+		//
+		// byte dataArray[] = new byte[n];
+		//
+		// for (int i = 0; n > i; i++) {
+		// int bitmask = 0x0000FF;
+		// byte valueToStore = (byte) (data & bitmask);
+		//
+		// dataArray[i] = valueToStore;
+		//
+		// System.out.println("bitmask: " + bitmask);
+		// System.out.println("value: " + valueToStore);
+		//
+		// for (int x = 0; x <= 7; x++) {
+		// data >>>= data;
+		// }
+		// }
+		//
+		// // bytes needed
+		// System.out.println(n);
+		// return dataArray;
 		final ByteBuffer bb = ByteBuffer.allocate(Long.SIZE / Byte.SIZE);
 		bb.order(ByteOrder.LITTLE_ENDIAN);
 		bb.putLong(data);
+		return bb.array();
+	}
+	
+	public static byte[] storeIntInToByte(int data) {
+	
+		final ByteBuffer bb = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
+		bb.order(ByteOrder.LITTLE_ENDIAN);
+		bb.putInt(data);
 		return bb.array();
 	}
 
