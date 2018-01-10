@@ -70,7 +70,7 @@ public class FileSenderController implements Runnable {
 		}
 		System.out.println("INFO State: " + currentState);
 	}
-	
+
 	public static void main(String[] args) {
 		new Thread(new FileSenderController()).run();
 	}
@@ -79,9 +79,9 @@ public class FileSenderController implements Runnable {
 		switch (currentState) {
 		case IDLE:
 			while (true) {
-				//System.out.println("File please:");
-				//Scanner in = new Scanner(System.in);
-				//String file = in.nextLine();
+				// System.out.println("File please:");
+				// Scanner in = new Scanner(System.in);
+				// String file = in.nextLine();
 				// FileInputStream FileIn = new FileInputStream(file);
 				File f = new File("test.txt");
 				try {
@@ -92,34 +92,29 @@ public class FileSenderController implements Runnable {
 					continue;
 				}
 			}
-			System.out.println("File Found");
 			processMsg(Msg.RECEIVED_PACKAGE);
 
 		case SPLIT_DATA:
-			if(pay.splitted) {
+			if (pay.splitted) {
 				processMsg(Msg.DATA_SPLITTED);
 			}
-			break;
 
 		case BUILD_CONNECTION:
+			System.out.println("hello");
 			InetAddress adress = null;
 			try {
-				adress = InetAddress.getLocalHost();
-			} catch (UnknownHostException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try {
-				transmitter = new Tx(adress,8086,pay.getCompleteDataArray().length,1400,pay);
+				adress = InetAddress.getLoopbackAddress();
+				transmitter = new Tx(adress, 8086, pay.getCompleteDataArray().length, 1400, pay);
+				System.out.println("nice");
 			} catch (SocketException e) {
-				// TODO Auto-generated catch block
+				processMsg(Msg.CONNECTION_INTERRUPTED);
 				e.printStackTrace();
 			} catch (InvalidPackageSizeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			break;
-			
+			processMsg(Msg.CONNECTION_SUCCESS);
+
 		case SEND_FIRST:
 			size = pay.getSize();
 			try {
@@ -131,7 +126,6 @@ public class FileSenderController implements Runnable {
 			processMsg(Msg.ACK0_RECEIVED);
 			break;
 
-
 		case SEND:
 			index++;
 			try {
@@ -140,7 +134,7 @@ public class FileSenderController implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if(index == (size-1)) {
+			if (index == (size - 1)) {
 				transmitter.allSend = true;
 			}
 			break;
@@ -153,7 +147,7 @@ public class FileSenderController implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if(index == (size-1)) {
+			if (index == (size - 1)) {
 				transmitter.allSend = true;
 			}
 			break;
@@ -165,13 +159,13 @@ public class FileSenderController implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if(index == (size-1)) {
+			if (index == (size - 1)) {
 				transmitter.allSend = true;
 			}
 			break;
 
 		case RECEIVE_ACK0:
-			
+
 			break;
 
 		case RECEIVE_ACK1:
@@ -186,7 +180,7 @@ public class FileSenderController implements Runnable {
 	class GoSplit extends Transition {
 		@Override
 		public State execute(Msg input) {
-			System.out.println("Package Received!");
+			System.out.println("File Received!");
 			return State.SPLIT_DATA;
 		}
 	}
@@ -194,7 +188,7 @@ public class FileSenderController implements Runnable {
 	class BuildHeader extends Transition {
 		@Override
 		public State execute(Msg input) {
-			System.out.println("Header Builded");
+			System.out.println("Header Builded at Sending now");
 			return State.BUILD_CONNECTION;
 		}
 	}
@@ -202,8 +196,8 @@ public class FileSenderController implements Runnable {
 	class SendFirst extends Transition {
 		@Override
 		public State execute(Msg input) {
-			System.out.println("Send Package");
-			return State.SEND;
+			System.out.println("Start sending Package");
+			return State.SEND_FIRST;
 		}
 	}
 
