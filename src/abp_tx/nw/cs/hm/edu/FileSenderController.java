@@ -103,18 +103,17 @@ public class FileSenderController implements Runnable {
 			System.out.println("hello");
 			InetAddress adress = null;
 			try {
-				try {
-					adress = InetAddress.getByName("10.179.6.174");
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				transmitter = new Tx(adress, 8086, pay.getCompleteDataArray().length, 1400, pay);
+					adress = InetAddress.getByName("192.168.178.137");
+				
+				transmitter = new Tx(adress, 8087, pay.getCompleteDataArray().length, 1400, pay);
 				System.out.println("nice");
 			} catch (SocketException e) {
 				processMsg(Msg.CONNECTION_INTERRUPTED);
 				e.printStackTrace();
 			} catch (InvalidPackageSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

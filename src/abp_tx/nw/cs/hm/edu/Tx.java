@@ -19,10 +19,11 @@ public class Tx {
 	private int dataPkgSize = 0;
 	private int sequenceNrSize = 0;
 	private int checkSumNrSize = 0;
-	private int ack = 0;
+	private int ack = 1;
 	private Payload payload = null;
 	DatagramSocket outPutSocket;
 	public boolean allSend = false;
+	private byte[] inData = new byte[1400];
 
 	public Tx(InetAddress rx_ip, int port, int completePkgSize, int dataPkgSize, Payload payload)
 			throws SocketException, InvalidPackageSizeException {
@@ -79,6 +80,56 @@ public class Tx {
 		CRC32 crc32 = new CRC32();
 		crc32.update(field);
 		return crc32.getValue();
+	}
+	
+	public void waitAck0() {
+		DatagramPacket input = null;
+		try {
+			input = new DatagramPacket(inData, inData.length,InetAddress.getByName("192.168.178.137"),8087);
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			outPutSocket.receive(input);
+			System.out.println("package received");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		byte[] head = input.getData();
+		int ack = head[0];
+		
+		if(ack == 0) {
+			
+		} else {
+			
+		}
+	}
+	
+	public void waitAck1() {
+		DatagramPacket input = null;
+		try {
+			input = new DatagramPacket(inData, inData.length,InetAddress.getByName("192.168.178.137"),8087);
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			outPutSocket.receive(input);
+			System.out.println("package received");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		byte[] head = input.getData();
+		int ack = head[0];
+		
+		if(ack == 1) {
+			
+		} else {
+			
+		}
 	}
 
 	public static byte[] storeLongInToByte(Long data) {
