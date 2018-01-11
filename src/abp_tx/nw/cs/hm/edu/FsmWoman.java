@@ -55,7 +55,7 @@ public class FsmWoman {
 	 * to be performed whenever this transition occurs.
 	 */
 	abstract class Transition {
-		abstract public State execute(Msg input);
+		abstract public State execute(abp_tx.nw.cs.hm.edu.FileSenderController.Msg input);
 	}
 	
 	class SayHi extends Transition {

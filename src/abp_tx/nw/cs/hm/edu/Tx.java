@@ -42,7 +42,23 @@ public class Tx {
 		this.payload = payload;
 	}
 
+	public void sequenceUP () {
+		sequenceNrSize++;
+	}
+	
 	public void send(int index) throws IOException {
+		// prepare packet
+		DatagramPacket p = preparePacket(index);
+		outPutSocket.send(p);
+	}
+	
+	public void sendNext(int index) throws IOException {
+		
+		if(ack == 0) {
+			ack = 1;
+		} else {
+			ack = 0;
+		}
 		// prepare packet
 		DatagramPacket p = preparePacket(index);
 		outPutSocket.send(p);
@@ -56,8 +72,13 @@ public class Tx {
 		byte[] dataFrame = payload.getCompleteDataArray();
 		dataFrame = Arrays.copyOfRange(dataFrame, index, index + dataPkgSize);
 
+		System.out.println(dataFrame.length);
+
 		byte[] header = getHeader(dataFrame);
 
+		
+
+		System.out.println(header.length);
 		return new DatagramPacket(header, header.length, RX_IP, PORT);
 	}
 
@@ -68,10 +89,9 @@ public class Tx {
 		try {
 			output.write(storeIntInToByte(ack));
 			output.write(storeIntInToByte(payload.getSequence()));
-			output.write(storeIntInToByte(generateChecksum(data)));
+			output.write(storeLongInToByte(generateChecksum(data)));
 			output.write(storeIntInToByte(data.length));
 
-			System.out.println(data.length);
 			output.write(data);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -79,21 +99,20 @@ public class Tx {
 		return output.toByteArray();
 	}
 
-	private int generateChecksum(byte[] field) {
-		int checksum = 0;
-		for(byte b : field) {
-			checksum += b;
-		}
-		
-		System.out.println(checksum);
-		return checksum;
-//		CRC32 crc32 = new CRC32();
-//		crc32.update(field);
-//		System.out.println(crc32.getValue());
-//		return crc32.getValue();
+	private long generateChecksum(byte[] field) {
+//		int checksum = 0;
+//		for(byte b : field) {
+//			checksum += b;
+//		}
+//		
+//		return checksum;
+		CRC32 crc32 = new CRC32();
+		crc32.update(field);
+		System.out.println(crc32.getValue());
+		return crc32.getValue();
 	}
 	
-	public void waitAck0() {
+	public boolean waitAck0() {
 		DatagramPacket input = null;
 		try {
 			input = new DatagramPacket(inData, inData.length,InetAddress.getByName("192.168.178.137"),8087);
@@ -112,13 +131,14 @@ public class Tx {
 		int ack = head[0];
 		
 		if(ack == 0) {
-			
+			return true;
 		} else {
 			
 		}
+		return false;
 	}
 	
-	public void waitAck1() {
+	public boolean waitAck1() {
 		DatagramPacket input = null;
 		try {
 			input = new DatagramPacket(inData, inData.length,InetAddress.getByName("192.168.178.137"),8087);
@@ -137,9 +157,9 @@ public class Tx {
 		int ack = head[0];
 		
 		if(ack == 1) {
-			
+			return true;
 		} else {
-			
+			return false;
 		}
 	}
 
@@ -183,6 +203,12 @@ public class Tx {
 		bb.order(ByteOrder.LITTLE_ENDIAN);
 		bb.putInt(data);
 		return bb.array();
+	}
+	
+	public int byteToInt(byte[] input) {
+		final ByteBuffer buff = ByteBuffer.wrap(input);
+		buff.order(ByteOrder.LITTLE_ENDIAN);
+		return buff.getInt();
 	}
 
 }
