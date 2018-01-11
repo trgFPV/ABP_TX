@@ -103,8 +103,8 @@ public class FileSenderController implements Runnable {
 			System.out.println("hello");
 			InetAddress adress = null;
 			try {
-					adress = InetAddress.getByName("192.168.178.137");
-				
+				adress = InetAddress.getByName("192.168.178.137");
+
 				transmitter = new Tx(adress, 8087, pay.getCompleteDataArray().length, 1400, pay);
 				System.out.println("nice");
 			} catch (SocketException e) {
@@ -127,7 +127,6 @@ public class FileSenderController implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			processMsg(Msg.ACK0_RECEIVED);
 			break;
 
 		case SEND:
