@@ -68,7 +68,10 @@ public class Tx {
 		try {
 			output.write(storeIntInToByte(ack));
 			output.write(storeIntInToByte(payload.getSequence()));
-			output.write(storeLongInToByte(generateChecksum(data)));
+			output.write(storeIntInToByte(generateChecksum(data)));
+			output.write(storeIntInToByte(data.length));
+
+			System.out.println(data.length);
 			output.write(data);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -76,10 +79,18 @@ public class Tx {
 		return output.toByteArray();
 	}
 
-	private long generateChecksum(byte[] field) {
-		CRC32 crc32 = new CRC32();
-		crc32.update(field);
-		return crc32.getValue();
+	private int generateChecksum(byte[] field) {
+		int checksum = 0;
+		for(byte b : field) {
+			checksum += b;
+		}
+		
+		System.out.println(checksum);
+		return checksum;
+//		CRC32 crc32 = new CRC32();
+//		crc32.update(field);
+//		System.out.println(crc32.getValue());
+//		return crc32.getValue();
 	}
 	
 	public void waitAck0() {
