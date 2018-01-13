@@ -186,7 +186,12 @@ public class FileSenderController implements Runnable {
 				processMsg(Msg.NO_PACKAGE_LEFT);
 			}
 
-			processMsg(Msg.SEND_SUCCESSFULL);
+			while (true) {
+				if (transmitter.SendAgain()) {
+					processMsg(Msg.SEND_SUCCESSFULL);
+					break;
+				}
+			}
 
 		}
 	}

@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
@@ -59,6 +60,12 @@ public class Tx {
 		} else {
 			ack = 0;
 		}
+		
+		if(index == payload.dataArray.size()-1) {
+			allSend = true;
+			ack = 2;
+		}
+		
 		// prepare packet
 		DatagramPacket p = preparePacket(index);
 		outPutSocket.send(p);
@@ -108,7 +115,6 @@ public class Tx {
 //		return checksum;
 		CRC32 crc32 = new CRC32();
 		crc32.update(field);
-		System.out.println(crc32.getValue());
 		return crc32.getValue();
 	}
 	
@@ -209,6 +215,31 @@ public class Tx {
 		final ByteBuffer buff = ByteBuffer.wrap(input);
 		buff.order(ByteOrder.LITTLE_ENDIAN);
 		return buff.getInt();
+	}
+
+	public boolean SendAgain() {
+		DatagramPacket input = null;
+		try {
+			input = new DatagramPacket(inData, inData.length,InetAddress.getByName("192.168.178.137"),8087);
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			outPutSocket.receive(input);
+			System.out.println("package received");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		byte[] head = input.getData();
+		int ack = head[0];
+		
+		if(ack == this.ack) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

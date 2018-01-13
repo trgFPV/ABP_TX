@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Payload {
-	private ArrayList<Byte> dataArray = new ArrayList<>();
+	public ArrayList<Byte> dataArray = new ArrayList<>();
 	private int idx;
 	private int size;
 	public boolean splitted = false;
