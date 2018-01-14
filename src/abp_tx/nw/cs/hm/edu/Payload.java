@@ -26,7 +26,7 @@ public class Payload {
 			// read data as long its there
 			while ((dataByte = fis.read()) != -1) {
 				dataArray.add((byte) dataByte);
-				size = size + 1;
+				size += 1;
 			}
 		} finally {
 			fis.close();
