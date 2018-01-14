@@ -118,6 +118,26 @@ public class Tx {
 		return crc32.getValue();
 	}
 	
+	public int waitForIT() {
+		DatagramPacket input = null;
+		try {
+			input = new DatagramPacket(inData, inData.length,InetAddress.getByName("192.168.178.137"),8087);
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			outPutSocket.receive(input);
+			System.out.println("package received");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		byte[] head = input.getData();
+		int ack = head[0];
+		return ack;
+	}
+	
 	public boolean waitAck0() {
 		DatagramPacket input = null;
 		try {

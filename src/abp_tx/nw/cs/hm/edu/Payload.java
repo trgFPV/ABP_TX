@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class Payload {
 	public ArrayList<Byte> dataArray = new ArrayList<>();
 	private int idx;
+	private int seq = 0;
 	private int size;
 	public boolean splitted = false;
 
@@ -43,7 +44,7 @@ public class Payload {
 	}
 	
 	public int getSequence () {
-		return idx;
+		return seq++;
 	}
 
 	public byte[] getCompleteDataArray() {
