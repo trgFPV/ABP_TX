@@ -9,6 +9,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import javax.swing.Timer;
+
 public class FileSenderController implements Runnable {
 	enum State {
 		IDLE
@@ -32,6 +34,10 @@ public class FileSenderController implements Runnable {
 	private int ack = 1;
 	private boolean process = true;
 
+	private Timer timer;
+	private int timeoutCounter = 0;
+	private int TIME_TO_WAIT = 10;
+
 	/**
 	 * constructor
 	 */
@@ -45,6 +51,15 @@ public class FileSenderController implements Runnable {
 
 		transition[State.IDLE.ordinal()][Msg.TIMEOUT.ordinal()] = new Timeout();
 
+		timer = new Timer(1000, e->countUp());
+
+	}
+	
+	private void countUp() {
+		timeoutCounter += 1;
+		if (timeoutCounter == TIME_TO_WAIT) {
+			this.processMsg(Msg.TIMEOUT);
+		}
 	}
 
 	public void processMsg(Msg input) {
@@ -62,18 +77,13 @@ public class FileSenderController implements Runnable {
 
 	public void run() {
 		try {
-			pay = new Payload(new File("test.txt"));
+			pay = new Payload(new File("birthday-cake.jpg"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		InetAddress adress = null;
-		try {
-			adress = InetAddress.getByName("192.168.178.137");
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		adress = InetAddress.getLoopbackAddress();
 		try {
 			transmitter = new Tx(adress, 8087, pay.getCompleteDataArray().length, 1420, pay);
 		} catch (SocketException | InvalidPackageSizeException e) {
@@ -87,9 +97,11 @@ public class FileSenderController implements Runnable {
 			e.printStackTrace();
 		}
 		while (process) {
-
+			timer.start();
+			System.out.println("wait");
 			int LOLack = transmitter.waitForIT();
-
+			timer.stop();
+			timeoutCounter = 0;
 			switch (ack) {
 			case 0:
 				if (ack == LOLack) {

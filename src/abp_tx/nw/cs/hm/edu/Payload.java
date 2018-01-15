@@ -10,6 +10,7 @@ public class Payload {
 	private int idx;
 	private int seq = 0;
 	private int size;
+	public String filename;
 	public boolean splitted = false;
 
 	/*
@@ -19,6 +20,7 @@ public class Payload {
 	public Payload(File f) throws IOException {
 		this.size = 0;
 		FileInputStream fis = null;
+		this.filename = f.getName();
 		try {
 			fis = new FileInputStream(f);
 			int dataByte;
