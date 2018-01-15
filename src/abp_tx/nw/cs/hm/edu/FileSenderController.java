@@ -85,7 +85,7 @@ public class FileSenderController implements Runnable {
 		InetAddress adress = null;
 		adress = InetAddress.getLoopbackAddress();
 		try {
-			transmitter = new Tx(adress, 8087, pay.getCompleteDataArray().length, 1420, pay);
+			transmitter = new Tx(adress, 8087, pay.getCompleteDataArray().length, 1400, pay);
 		} catch (SocketException | InvalidPackageSizeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

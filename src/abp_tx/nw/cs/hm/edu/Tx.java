@@ -24,7 +24,7 @@ public class Tx {
 	private Payload payload = null;
 	DatagramSocket outPutSocket;
 	public boolean allSend = false;
-	private byte[] inData = new byte[1400];
+	private byte[] inData = new byte[1000];
 
 	public Tx(InetAddress rx_ip, int port, int completePkgSize, int dataPkgSize, Payload payload)
 			throws SocketException, InvalidPackageSizeException {
@@ -55,6 +55,7 @@ public class Tx {
 	public void sendNext(int index, int ack) throws IOException {
 
 		if (index >= payload.dataArray.size() - 1) {
+			System.out.println("index:" + index + "Size: "+ payload.dataArray.size());
 			allSend = true;
 			ack = 2;
 		}
